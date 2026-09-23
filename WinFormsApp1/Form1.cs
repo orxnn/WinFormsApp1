@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
-namespace WinFormsApp1
+namespace Registr
 {
     public partial class Form1 : Form
     {
@@ -11,61 +12,66 @@ namespace WinFormsApp1
             InitializeComponent();
         }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
-        }
+        // Qeydiyyatdan keçən istifadəçiləri yaddaşda saxlamaq üçün Dictionary
+        private static Dictionary<string, string> users = new Dictionary<string, string>();
 
-        private void textBox2_TextChanged(object sender, EventArgs e)
+        // 1. QEYDİYYAT DÜYMƏSİ (Sign in)
+        private void button2_Click(object sender, EventArgs e)
         {
-        }
+            string newUser = textBox4.Text.Trim();
+            string newPass = textBox3.Text.Trim();
 
-        private void label1_Click(object sender, EventArgs e)
-        {
-        }
-
-        // Login düyməsi üçün
-        private void button1_Click(object sender, EventArgs e)
-        {
-            string username = textBox1.Text.Trim();
-            string password = textBox2.Text.Trim();
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            // Boş xana yoxlanışı
+            if (string.IsNullOrEmpty(newUser) || string.IsNullOrEmpty(newPass))
             {
-                MessageBox.Show("Lütfən, bütün xanaları doldurun!", "Xəbərdarlıq", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Xana boş ola bilməz!", "Bildiriş", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            if (username == "admin" && password == "1234")
+            // İstifadəçinin mövcudluq yoxlanışı
+            if (users.ContainsKey(newUser))
             {
-                MessageBox.Show("Giriş uğurludur!", "Məlumat", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                Menuform menu = new Menuform();
-                menu.Show();
-                this.Hide();
+                MessageBox.Show("Bu istifadəçi artıq mövcuddur!", "Bildiriş", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
             else
             {
-                MessageBox.Show("E-poçt/nömrə və ya kod yanlışdır!", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Yeni istifadəçini əlavə et
+                users.Add(newUser, newPass);
+                MessageBox.Show("Uğurla qeydiyyatdan keçdiniz!", "Bildiriş", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Xanaları təmizlə
+                textBox3.Clear();
+                textBox4.Clear();
             }
         }
 
-        // Clear düyməsi üçün
-        private void button2_Click(object sender, EventArgs e)
+        // 2. GİRİŞ DÜYMƏSİ (Login)
+        private void button1_Click(object sender, EventArgs e)
         {
-            textBox1.Clear();
-            textBox2.Clear();
-            textBox1.Focus();
-        }
+            string loginUser = textBox1.Text.Trim();
+            string loginPass = textBox2.Text.Trim();
 
-        // Exit düyməsi üçün
-        private void button3_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
+            // Boş xana yoxlanışı
+            if (string.IsNullOrEmpty(loginUser) || string.IsNullOrEmpty(loginPass))
+            {
+                MessageBox.Show("İstifadəçi adı və ya şifrə boş ola bilməz!", "Bildiriş", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
-        private void button2_Click_1(object sender, EventArgs e)
-        {
+            // Şifrə və istifadəçi adının doğruluğunu yoxlayırıq
+            if (users.ContainsKey(loginUser) && users[loginUser] == loginPass)
+            {
+                MessageBox.Show("Sistemə uğurla daxil oldunuz!", "Xoş gəldiniz", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                // Giriş uğurlu olduqda xanaları təmizləyirik
+                textBox1.Clear();
+                textBox2.Clear();
+            }
+            else
+            {
+                MessageBox.Show("İstifadəçi adı və ya şifrə yanlışdır!", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
